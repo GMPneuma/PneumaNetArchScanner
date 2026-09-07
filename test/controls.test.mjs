@@ -95,3 +95,40 @@ test("configured pulse counts drive row and bulk labels, effects, and expiration
     assert.equal(makePulse({public:true,users:[]}).count,count);
   }
 });
+
+test("private reveals accumulate and selected removal preserves other runners and shared owners", async () => {
+  environment(); const scene = makeScene();
+  const a = makeToken(scene, "a"), b = makeToken(scene, "b");
+  const first = makeToken(scene, "first", { ap: false, owners: ["player", "offline"] });
+  const second = makeToken(scene, "second", { ap: false, owners: ["other", "offline"] });
+  await applyAPControls([a,b], { reveal: "runner", pulse: "loop" }, { runner: first });
+  await applyAPControls([a,b], { reveal: "runner" }, { runner: second });
+  for (const doc of [a,b]) {
+    assert.deepEqual(new Set(apData(doc).discovery.users), new Set(["player", "other", "offline"]));
+    assert.equal(controlState(doc, 10000, first.uuid).runner, true);
+    assert.equal(controlState(doc, 10000, second.uuid).runner, true);
+  }
+  const remove = controlChange("reveal", "runner", false);
+  await applyAPControls([a,b], remove, { runner: first });
+  for (const doc of [a,b]) {
+    assert.deepEqual(new Set(apData(doc).discovery.users), new Set(["other", "offline"]));
+    assert.deepEqual(apData(doc).discovery.runners, [second.uuid]);
+    assert.equal(apData(doc).pulse.loop, true);
+  }
+  await applyAPControls([a,b], remove, { runner: second });
+  for (const doc of [a,b]) {
+    assert.equal(apData(doc).discovery.revealed, false);
+    assert.equal(apData(doc).pulse, null);
+  }
+});
+
+test("legacy private discoveries retain their first runner when adding another", async () => {
+  environment(); const scene = makeScene(); const ap = makeToken(scene);
+  const first = makeToken(scene, "first", { ap: false });
+  const second = makeToken(scene, "second", { ap: false, owners: ["other"] });
+  apData(ap).discovery = { revealed: true, public: false, users: ["player"], runners: [first.uuid] };
+  await applyAPControls([ap], { reveal: "runner" }, { runner: second });
+  await applyAPControls([ap], { reveal: "removeRunner" }, { runner: second });
+  assert.deepEqual(apData(ap).discovery.users, ["player"]);
+  assert.deepEqual(apData(ap).discovery.runners, [first.uuid]);
+});

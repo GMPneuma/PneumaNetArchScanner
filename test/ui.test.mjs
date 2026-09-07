@@ -189,8 +189,8 @@ test("private reveals follow the selected second Netrunner for row and bulk acti
   let data=panel.getData();
   assert.equal(data.rows.find(row=>row.id===a.id).controls.find(option=>option.key==="runner").checked,false);
   await panel.applyControls([a],{reveal:"runner"});
-  assert.deepEqual(apData(a).discovery.users,["other"]);
-  assert.deepEqual(apData(a).discovery.runners,[second.uuid]);
+  assert.deepEqual(apData(a).discovery.users,["player","other"]);
+  assert.deepEqual(apData(a).discovery.runners,[first.uuid,second.uuid]);
   panel.bulkChanges={reveal:"runner"};
   await panel.handleAction("apply");
   assert.deepEqual(apData(b).discovery.users,["other"]);
@@ -210,7 +210,7 @@ test("Revealed to shows the recorded Netrunner token rather than its player acco
   const discovery=structuredClone(apData(ap).discovery);
   panel.runnerId=other.id;
   let row=panel.getData().rows[0];
-  assert.equal(row.status,`Pex · ${pex.id.slice(-4)}`);
+  assert.equal(row.status,"Pex");
   assert.match(row.statusTitle,/Netrunner player/);
   assert.match(row.statusTitle,/Other player/);
   assert.deepEqual(apData(ap).discovery,discovery);

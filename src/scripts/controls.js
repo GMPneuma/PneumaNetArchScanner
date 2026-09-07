@@ -26,5 +26,6 @@ export function bulkControls(documents, changes, now, runnerUuid = undefined) {
 }
 export function controlChange(group, key, checked) {
   if (group === "showName") return { showName: checked };
+  if (group === "reveal" && key === "runner" && !checked) return { reveal: "removeRunner" };
   return { [group]: checked ? key : group === "reveal" ? "hidden" : "off" };
 }

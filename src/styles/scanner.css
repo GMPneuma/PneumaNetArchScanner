@@ -198,8 +198,8 @@
 .pneuma-scanner-panel .ap-control-table { border: 0; background: transparent; }
 .pneuma-scanner-panel .ap-list tbody tr { background: rgba(0, 0, 0, 0.025); }
 .pneuma-scanner-panel .ap-list tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.055); }
-.pneuma-scanner-panel .ap-list tbody tr:hover { background: color-mix(in srgb, var(--ap-blue) 9%, transparent); }
-.pneuma-scanner-panel .ap-list tbody tr:has([data-ap-select]:checked) { background: color-mix(in srgb, var(--ap-blue) 13%, transparent); }
+.pneuma-scanner-panel .ap-list tbody tr:hover { background: color-mix(in srgb, var(--ap-green) 9%, transparent); }
+.pneuma-scanner-panel .ap-list tbody tr:has([data-ap-select]:checked) { background: color-mix(in srgb, var(--ap-green) 13%, transparent); }
 .pneuma-scanner-panel .ap-control-table td small { margin-left: 32px; font-size: 11px; }
 .pneuma-scanner-panel .ap-bulk-bar {
   border-top: 1px solid var(--ap-rule);
@@ -260,6 +260,14 @@ html[data-cpr-theme="darkmode"] .pneuma-scanner-panel {
 
 .pneuma-scanner-panel .ap-top-left { min-width: 0; }
 .pneuma-scanner-panel .ap-runner-row { display: flex; align-items: flex-end; gap: 12px; }
-.pneuma-scanner-panel .ap-runner-row .ap-runner-field { flex: 1; min-width: 0; width: auto; }
+.pneuma-scanner-panel .ap-runner-row .ap-runner-field { flex: 0 0 50%; min-width: 0; width: 50%; }
 .pneuma-scanner-panel .ap-runner-row .ap-player-owned { flex: 0 0 auto; margin: 0; min-height: 32px; white-space: nowrap; }
 .pneuma-scanner-panel .ap-radius-field > span { white-space: normal; }
+
+.pneuma-scanner-panel .ap-dynamic-name,
+.pneuma-scanner-panel .ap-dynamic-label { color: var(--ap-green); }
+.pneuma-scanner-panel .ap-dynamic-name { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.pneuma-scanner-panel .ap-list input[type="checkbox"] { accent-color: var(--ap-green); }
+
+.pneuma-scanner-panel .ap-selection-count { background: #28633a; color: #ffffff; }

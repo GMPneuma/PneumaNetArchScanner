@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.4
+
+- Keep previous recipients when revealing an AP to another Netrunner. Unchecking removes only the selected Netrunner, preserving access through shared owners.
+- Remove UID suffixes from displayed token names and use the selected token name in the reveal heading, with truncation and a full-name tooltip.
+- Treat an empty distance filter as zero and narrow the Netrunner dropdown.
+- Match AP controls, dynamic labels, and row highlights to the green card; give the selected counter a dark green background.
+
 ## 0.8.3
 
 - Show the generic AP icon to players while the AP name is hidden. Revealing the name also reveals the actual token artwork; hiding it restores the generic icon.

@@ -2,7 +2,7 @@ import { accessPointTypes, typeInfo } from "./types.js";
 import { MODULE_ID, MODULE_TITLE, TYPES } from "./constants.js";
 import { apData, isAP, sceneDistance, validateRadius, withinRadius } from "./model.js";
 import { architectures, colorFor, saveUnassignedColor, hideAPs, pulseAPs, requireGM, applyAPControls, serverNow, saveAP, stopPulses } from "./actions.js";
-import { setting, pulseLabel } from "./settings.js";
+import { setting, pulseLabel, pulseCount } from "./settings.js";
 
 import { visibleControls, controlState, bulkControls, controlChange } from "./controls.js";
 
@@ -93,7 +93,7 @@ export class ScannerPanel extends Application {
 
   getData() {
     if (setting("showRevealAll") === false && this.bulkChanges.reveal === "all") delete this.bulkChanges.reveal;
-    const tokenNames = new Map([...game.scenes].flatMap(scene => [...scene.tokens].map(token => [token.uuid, `${token.name} · ${token.id.slice(-4)}`])));
+    const tokenNames = new Map([...game.scenes].flatMap(scene => [...scene.tokens].map(token => [token.uuid, token.name])));
     const netNames = new Map(architectures().map((item) => [item.uuid, item.name]));
     this.pruneSelection();
     const runner = this.runner;
@@ -116,11 +116,11 @@ export class ScannerPanel extends Application {
       };
     }).sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity) || a.name.localeCompare(b.name));
     return {
-      showRevealAll: setting("showRevealAll") !== false, unassignedColor: colorFor("", this.scene), hasRollCard: Boolean(this.messageId), pulseLabel: pulseLabel(), sceneName: this.scene.name, result: this.result, hasResult: this.result !== null,
+      showRevealAll: setting("showRevealAll") !== false, unassignedColor: colorFor("", this.scene), hasRollCard: Boolean(this.messageId), pulseLabel: pulseLabel(), pulseCount: pulseCount(), pulseUnit: pulseCount() === 1 ? "time" : "times", sceneName: this.scene.name, result: this.result, hasResult: this.result !== null,
       radius: this.radius, units: this.scene.grid.units || "units", rows,
-      playerOwnedOnly: this.playerOwnedOnly, runnerMissing: !runner, hasRows: rows.length > 0,
+      playerOwnedOnly: this.playerOwnedOnly, runnerMissing: !runner, runnerName: runner?.name ?? "None", hasRows: rows.length > 0,
       runners: this.runners
-        .map((doc) => ({ id: doc.id, name: `${doc.name} · ${doc.id.slice(-4)}`, selected: doc.id === this.runnerId })),
+        .map((doc) => ({ id: doc.id, name: doc.name, selected: doc.id === this.runnerId })),
       bulkControls: bulkControls(this.selectedDocuments(), this.bulkChanges, serverNow(), this.runner?.uuid ?? null),
       canApply: this.selectedDocuments().length > 0 && Object.keys(this.bulkChanges).length > 0,
       selectedCount: rows.filter((row) => row.visible && row.selected).length,
@@ -147,7 +147,7 @@ export class ScannerPanel extends Application {
       this.render(false);
     });
     root.querySelector('[name="radius"]').addEventListener("change", (event) => {
-      try { this.radius = validateRadius(event.target.value); this.bulkChanges = {}; }
+      try { this.radius = validateRadius(event.target.value.trim() || "0"); this.bulkChanges = {}; }
       catch (error) { report(error); }
       this.render(false);
     });

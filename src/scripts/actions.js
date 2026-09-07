@@ -124,21 +124,26 @@ export async function applyAPControls(documents, changes, { runner = null } = {}
   const docs = checkedDocuments(documents);
   const { reveal, pulse, showName } = changes;
   if (showName !== undefined && typeof showName !== "boolean") throw new Error("Invalid AP name option.");
-  if (reveal !== undefined && !["runner", "all", "hidden"].includes(reveal)) throw new Error("Invalid reveal option.");
+  if (reveal !== undefined && !["runner", "all", "hidden", "removeRunner"].includes(reveal)) throw new Error("Invalid reveal option.");
   if (pulse !== undefined && !["five", "loop", "off"].includes(pulse)) throw new Error("Invalid pulse option.");
   if (reveal === undefined && pulse === undefined && showName === undefined) return 0;
-  const recipients = reveal && reveal !== "hidden" ? audienceFor(reveal, runner) : null;
+  const recipients = reveal && !["hidden", "removeRunner"].includes(reveal) ? audienceFor(reveal, runner) : null;
+  const discoveries = new Map();
+  if (reveal === "removeRunner" && !runner) throw new Error("Choose the Netrunner token to remove access.");
+  for (const doc of docs) {
+    if (reveal === "runner" || reveal === "removeRunner") discoveries.set(doc.uuid, await privateDiscovery(doc, runner, recipients));
+  }
   const startPulse = pulse === "five" || pulse === "loop";
-  if (startPulse && docs.some(doc => reveal === "hidden" || (!reveal && !apData(doc).discovery?.revealed))) {
+  if (startPulse && docs.some(doc => reveal === "hidden" || (reveal === "removeRunner" && !discoveries.get(doc.uuid)?.revealed) || (!reveal && !apData(doc).discovery?.revealed))) {
     throw new Error("Reveal every selected AP before pulsing, or choose a reveal option together with the pulse.");
   }
   const pulseRecipients = startPulse ? audienceFor("all", runner) : null;
-  await updateGroups(docs, () => {
+  await updateGroups(docs, (doc) => {
     const updates = {};
     if (showName !== undefined) updates[`flags.${MODULE_ID}.showName`] = showName;
-    if (reveal !== undefined) updates[`flags.${MODULE_ID}.discovery`] = recipients
-      ? mergeDiscovery(blankDiscovery(), recipients, runner?.uuid) : blankDiscovery();
-    if (reveal === "hidden" || pulse === "off") updates[`flags.${MODULE_ID}.pulse`] = null;
+    if (reveal !== undefined) updates[`flags.${MODULE_ID}.discovery`] = discoveries.get(doc.uuid) ?? (recipients
+      ? mergeDiscovery(blankDiscovery(), recipients, runner?.uuid) : blankDiscovery());
+    if (reveal === "hidden" || (reveal === "removeRunner" && !discoveries.get(doc.uuid)?.revealed) || pulse === "off") updates[`flags.${MODULE_ID}.pulse`] = null;
     else if (startPulse) updates[`flags.${MODULE_ID}.pulse`] = makePulse(pulseRecipients, { loop: pulse === "loop" });
     return updates;
   });
@@ -159,4 +164,25 @@ export async function updateActivePulseSpeed(seconds) {
       [`flags.${MODULE_ID}.pulse.started`]: now - completed * duration,
     };
   });
+}
+async function privateDiscovery(doc, runner, recipients) {
+  const previous = apData(doc).discovery;
+  if (!recipients && (!previous?.revealed || previous.public || !previous.runners?.includes(runner.uuid))) return previous ?? blankDiscovery();
+  const old = previous?.revealed && !previous.public ? previous : blankDiscovery();
+  const runnerUsers = { ...(old.runnerUsers ?? {}) };
+  for (const uuid of old.runners ?? []) {
+    if (runnerUsers[uuid]) continue;
+    const token = game.scenes.contents.flatMap(scene => scene.tokens.contents).find(token => token.uuid === uuid) ?? await fromUuid(uuid);
+    runnerUsers[uuid] = token?.actor ? game.users.filter(user => !user.isGM && token.actor.testUserPermission(user, CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER)).map(user => user.id) : [];
+  }
+  if (recipients) {
+    runnerUsers[runner.uuid] = [...new Set([...(runnerUsers[runner.uuid] ?? []), ...recipients.users])];
+    return { ...mergeDiscovery(old, recipients, runner.uuid), runnerUsers };
+  }
+  const removed = new Set(runnerUsers[runner.uuid] ?? []);
+  delete runnerUsers[runner.uuid];
+  const retained = new Set(Object.values(runnerUsers).flat());
+  const users = (old.users ?? []).filter(id => !removed.has(id) || retained.has(id));
+  const runners = (old.runners ?? []).filter(uuid => uuid !== runner.uuid);
+  return users.length ? { ...old, users, runners, runnerUsers } : blankDiscovery();
 }
