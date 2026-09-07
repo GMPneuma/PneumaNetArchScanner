@@ -10,7 +10,7 @@ Install using this manifest URL: https://github.com/GMPneuma/PneumaNetArchScanne
 
 For manual installation, copy `dist/pneuma-net-arch-scanner/` into your Foundry user data `Data/modules/` directory. Restart Foundry if needed, then enable **Pneuma's NetArch Scanner** in a Cyberpunk RED world.
 
-The first active GM automatically receives an Actor folder named **Pneuma's NetArch Scanner**, containing six reusable templates: **Computer, Camera, Turret, Door Controller, and Alarm Panel**.
+The first active GM automatically receives an Actor folder named **Pneuma NetArch Scanner**, containing six reusable templates: **Computer, Camera, Turret, Door Controller, and Alarm Panel**.
 
 Templates use the system's native container Actor type. Existing templates and GM edits are preserved; missing templates are recreated on a later GM startup.
 

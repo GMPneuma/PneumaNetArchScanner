@@ -1,3 +1,4 @@
+import { ensureTemplates } from "./templates.js";
 import { MODULE_ID } from "./constants.js";
 
 export const setting = (key) => game.settings.get(MODULE_ID, key);
@@ -52,6 +53,24 @@ export function groupRevealSettings(html) {
   group.append(legend);
   styleRow.before(group);
   group.append(styleRow, radiusRow);
+  if (game.user.isGM) {
+    const row = document.createElement("div");
+    row.className = "form-group";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Re-create default AP templates";
+    button.title = "Create missing default templates. Existing templates are found in any Actor folder and are preserved.";
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      try {
+        const count = await ensureTemplates({ defaults: true, manual: true });
+        ui.notifications.info(count ? `Created ${count} missing AP templates.` : "All default AP templates already exist.");
+      } catch (error) { ui.notifications.error(error.message); }
+      finally { button.disabled = false; }
+    });
+    row.append(button);
+    group.after(row);
+  }
   const sync = () => {
     const disabled = style.value !== "vision";
     radiusRow.querySelectorAll("input").forEach(input => { input.disabled = disabled; });

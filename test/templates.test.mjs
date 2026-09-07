@@ -65,3 +65,36 @@ test("nested native configuration updates also keep AP lights and vision disable
   await ap.update({ light: { bright: 10, dim: 20 }, sight: { enabled: true } });
   assert.equal(ap.sight.enabled, false); assert.equal(ap.light.bright, 0); assert.equal(ap.light.dim, 0);
 });
+
+test("default template folders are renamed while custom folder names are preserved", async () => {
+  environment();
+  await ensureTemplates();
+  const folder = game.folders.get("folder");
+  assert.equal(folder.name, "Pneuma NetArch Scanner");
+  folder.update = async changes => Object.assign(folder, changes);
+  for (const name of ["Pneuma NET Architecture Scanner", "Pneuma's NetArch Scanner"]) {
+    folder.name = name;
+    await ensureTemplates();
+    assert.equal(folder.name, "Pneuma NetArch Scanner");
+    assert.equal(game.folders.size, 1);
+  }
+  folder.name = "My APs";
+  await ensureTemplates();
+  assert.equal(folder.name, "My APs");
+});
+test("moved templates do not recreate their folder or duplicate Actors; restore creates only missing defaults", async () => {
+  environment();
+  await ensureTemplates();
+  for (const actor of game.actors) actor.folder = "elsewhere";
+  game.folders.clear();
+  await ensureTemplates();
+  assert.equal(game.folders.size, 0);
+  assert.equal(await ensureTemplates({ defaults: true, manual: true }), 0);
+  assert.equal(game.folders.size, 0);
+  const computer = game.actors.find(actor => actor.getFlag(MODULE_ID, "templateType") === "computer");
+  game.actors.delete(computer.id);
+  assert.equal(await ensureTemplates({ defaults: true, manual: true }), 1);
+  assert.equal(game.actors.size, 6);
+  assert.equal(game.actors.filter(actor => actor.folder === "elsewhere").length, 5);
+  assert.equal(game.folders.size, 1);
+});

@@ -10,6 +10,8 @@
 - Enable appended numbers on AP actor prototype tokens and open AP properties on GM double-click.
 - Group reveal style and vision radius settings; disable radius for above-fog mode.
 - Remove default audience settings; pulses follow AP visibility.
+- Rename the default Actor folder to Pneuma NetArch Scanner and preserve templates moved to other folders.
+- Add a settings button to restore missing default AP templates without duplicating existing actors.
 
 ## 0.5.0 — Initial development version
 

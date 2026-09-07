@@ -6,25 +6,31 @@ export function activeGM() {
   return game.users.activeGM ?? game.users.filter((user) => user.active && user.isGM).sort((a, b) => a.id.localeCompare(b.id))[0];
 }
 
+const TEMPLATE_FOLDER = "Pneuma NetArch Scanner";
+const DEFAULT_FOLDER_NAMES = new Set([TEMPLATE_FOLDER, MODULE_TITLE, "Pneuma NET Architecture Scanner"]);
+
 let provisioning;
-export async function ensureTemplates() {
-  if (!game.user.isGM || activeGM()?.id !== game.user.id) return;
-  if (provisioning) return provisioning;
-  provisioning = provision().finally(() => { provisioning = null; });
+export async function ensureTemplates({ defaults = false, manual = false } = {}) {
+  if (!game.user.isGM || (!manual && activeGM()?.id !== game.user.id)) return;
+  if (provisioning) { await provisioning; if (!manual) return; }
+  provisioning = provision(defaults).finally(() => { provisioning = null; });
   return provisioning;
 }
 
-async function provision() {
+async function provision(defaults) {
   if (!game.documentTypes.Actor.includes("container")) throw new Error("Cyberpunk RED's container Actor type is unavailable.");
   let folder = game.folders.find((entry) => entry.type === "Actor"
-    && (entry.getFlag(MODULE_ID, "templates") || (!entry.folder && entry.name === MODULE_TITLE)));
-  if (!folder) folder = await Folder.create({ name: MODULE_TITLE, type: "Actor", sorting: "a", flags: { [MODULE_ID]: { templates: true } } });
+    && (entry.getFlag(MODULE_ID, "templates") || (!entry.folder && DEFAULT_FOLDER_NAMES.has(entry.name))));
+  if (folder && folder.name !== TEMPLATE_FOLDER && DEFAULT_FOLDER_NAMES.has(folder.name)) {
+    await folder.update({ name: TEMPLATE_FOLDER });
+  }
   const updates = game.actors.filter((actor) => (actor.getFlag?.(MODULE_ID, "templateType") || isAP(actor.prototypeToken))
     && actor.prototypeToken?.appendNumber !== true)
     .map((actor) => ({ _id: actor.id, "prototypeToken.appendNumber": true }));
   if (updates.length) await Actor.updateDocuments(updates);
-  const missing = accessPointTypes().filter((type) => !game.actors.some((actor) => actor.getFlag(MODULE_ID, "templateType") === type.id));
-  if (!missing.length) return;
+  const missing = (defaults ? TYPES : accessPointTypes()).filter((type) => !game.actors.some((actor) => actor.getFlag(MODULE_ID, "templateType") === type.id));
+  if (!missing.length) return 0;
+  if (!folder) folder = await Folder.create({ name: TEMPLATE_FOLDER, type: "Actor", sorting: "a", flags: { [MODULE_ID]: { templates: true } } });
   // createDocuments uses the native data model without CPRContainerActor.create's shop defaults.
   await Actor.createDocuments(missing.map((type) => ({
     name: `AP — ${type.label}`, type: "container", folder: folder.id,
@@ -40,6 +46,7 @@ async function provision() {
       flags: { [MODULE_ID]: freshAP(type.id) },
     },
   })));
+  return missing.length;
 }
 
 export function registerTokenGuards() {
