@@ -17,10 +17,13 @@ test("six private templates are created once without overwriting GM edits", asyn
   assert.equal(computer.prototypeToken.actorLink, false);
   const generic = game.actors.find(actor => actor.flags[MODULE_ID].templateType === "generic");
   assert.ok(generic.prototypeToken.texture.src.endsWith("/generic.svg"));
+  assert.equal(computer.prototypeToken.appendNumber, true);
+  computer.prototypeToken.appendNumber = false;
   computer.name = "GM custom terminal";
   await ensureTemplates();
   assert.equal(game.actors.size, 6);
   assert.equal(computer.name, "GM custom terminal");
+  assert.equal(computer.prototypeToken.appendNumber, true);
 });
 test("only the active GM provisions Actors, and simultaneous requests share work", async () => {
   const { player } = environment();

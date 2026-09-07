@@ -70,7 +70,7 @@ export class ScannerPanel extends Application {
     this.runnerId = runnerId;
     this.result = result;
     this.messageId = messageId;
-    this.playerOwnedOnly = false;
+    this.playerOwnedOnly = true;
     const configuredRadius = Number(setting("scannerRadius"));
     this.radius = Number.isFinite(configuredRadius) && configuredRadius >= 0 ? configuredRadius : 0;
     this.selected = new Set(selected);
@@ -93,6 +93,7 @@ export class ScannerPanel extends Application {
 
   getData() {
     if (setting("showRevealAll") === false && this.bulkChanges.reveal === "all") delete this.bulkChanges.reveal;
+    const tokenNames = new Map([...game.scenes].flatMap(scene => [...scene.tokens].map(token => [token.uuid, `${token.name} · ${token.id.slice(-4)}`])));
     const netNames = new Map(architectures().map((item) => [item.uuid, item.name]));
     this.pruneSelection();
     const runner = this.runner;
@@ -103,13 +104,15 @@ export class ScannerPanel extends Application {
       const visible = withinRadius(distance, this.radius);
       const discovery = data.discovery;
       const users = (discovery?.users ?? []).map((id) => game.users.get(id)?.name).filter(Boolean);
+      const recipients = (discovery?.runners ?? []).map(uuid => tokenNames.get(uuid) ?? "Removed Netrunner token");
       return {
         id: doc.id, name: doc.name, type: typeInfo(data.type)?.label ?? "Access Point",
         netarch: data.netarch ? netNames.get(data.netarch) ?? "Missing Architecture" : "Unassigned",
         color: colorFor(data.netarch, this.scene), distance, distanceText: distance === null ? "—" : distance.toFixed(1),
         visible, selected: this.selected.has(doc.id),
-        controls: visibleControls().map(option => ({ ...option, checked: controlState(doc, serverNow())[option.key], apId: doc.id, name: doc.name })),
-        status: !discovery?.revealed ? "Hidden" : discovery.public ? "All players" : users.join(", ") || "GM only",
+        controls: visibleControls().map(option => ({ ...option, checked: controlState(doc, serverNow(), this.runner?.uuid ?? null)[option.key], apId: doc.id, name: doc.name })),
+        status: !discovery?.revealed ? "Hidden" : discovery.public ? "All players" : recipients.join(", ") || (users.length ? `Players: ${users.join(", ")}` : "GM only"),
+        statusTitle: discovery?.revealed && !discovery.public && users.length ? `Player access: ${users.join(", ")}` : "",
       };
     }).sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity) || a.name.localeCompare(b.name));
     return {
@@ -118,7 +121,7 @@ export class ScannerPanel extends Application {
       playerOwnedOnly: this.playerOwnedOnly, runnerMissing: !runner, hasRows: rows.length > 0,
       runners: this.runners
         .map((doc) => ({ id: doc.id, name: `${doc.name} · ${doc.id.slice(-4)}`, selected: doc.id === this.runnerId })),
-      bulkControls: bulkControls(this.selectedDocuments(), this.bulkChanges, serverNow()),
+      bulkControls: bulkControls(this.selectedDocuments(), this.bulkChanges, serverNow(), this.runner?.uuid ?? null),
       canApply: this.selectedDocuments().length > 0 && Object.keys(this.bulkChanges).length > 0,
       selectedCount: rows.filter((row) => row.visible && row.selected).length,
       visibleCount: rows.filter((row) => row.visible).length, totalCount: rows.length,
@@ -155,19 +158,22 @@ export class ScannerPanel extends Application {
       this.syncControls(root);
     }));
     root.querySelectorAll("[data-control]").forEach(checkbox => checkbox.addEventListener("change", () => {
+      this.readRunnerSelection(root);
       const changes = controlChange(checkbox.dataset.group, checkbox.dataset.control, checkbox.checked);
       if (checkbox.dataset.apId) this.applyControls([this.scene.tokens.get(checkbox.dataset.apId)], changes).catch(report);
       else { Object.assign(this.bulkChanges, changes); this.syncControls(root); }
     }));
     const list = root.querySelector(".ap-list");
     const header = root.querySelector(".ap-list-header");
-    const syncHeader = () => { header.scrollLeft = list.scrollLeft; };
+    const bulk = root.querySelector(".ap-bulk-bar");
+    const syncHeader = () => { header.scrollLeft = list.scrollLeft; bulk.scrollLeft = list.scrollLeft; };
     list.addEventListener("scroll", syncHeader, { passive: true });
     syncHeader();
     this.renderRollCard(root);
     this.syncControls(root);
     root.querySelectorAll("button[data-action]").forEach((button) => button.addEventListener("click", (event) => {
       event.preventDefault();
+      this.readRunnerSelection(root);
       this.handleAction(button.dataset.action, button.dataset.apId).catch(report);
     }));
   }
@@ -199,11 +205,11 @@ export class ScannerPanel extends Application {
     const now = serverNow();
     root.querySelectorAll("[data-control][data-ap-id]").forEach(checkbox => {
       const doc = this.scene.tokens.get(checkbox.dataset.apId);
-      checkbox.checked = doc ? controlState(doc, now)[checkbox.dataset.control] : false;
+      checkbox.checked = doc ? controlState(doc, now, this.runner?.uuid ?? null)[checkbox.dataset.control] : false;
       checkbox.disabled = this.busy;
     });
     const docs = this.selectedDocuments();
-    for (const option of bulkControls(docs, this.bulkChanges, now)) {
+    for (const option of bulkControls(docs, this.bulkChanges, now, this.runner?.uuid ?? null)) {
       const checkbox = root.querySelector(`[data-control="${option.key}"]:not([data-ap-id])`);
       if (!checkbox) continue;
       checkbox.checked = option.checked; checkbox.indeterminate = option.mixed;
@@ -219,13 +225,22 @@ export class ScannerPanel extends Application {
     }, Math.min(2147483647, Math.max(50, Math.min(...ends) - now + 30)));
   }
 
+  readRunnerSelection(root) {
+    const select = root.querySelector('[name="runner"]');
+    if (select && this.runnerId !== select.value) {
+      this.runnerId = select.value;
+      this.bulkChanges = {};
+    }
+  }
+
   async applyControls(docs, changes) {
     requireGM();
     if (this.busy) return;
+    const runner = this.runner;
     this.busy = true;
     this.element.find("button, input, select").prop("disabled", true);
     try {
-      await applyAPControls(docs, changes, { runner: this.runner });
+      await applyAPControls(docs, changes, { runner });
       this.bulkChanges = {};
     } finally { this.busy = false; this.render(false); }
   }
@@ -302,7 +317,23 @@ export function openScanner({ scene = canvas.scene, runnerId = "", result = null
   return panel;
 }
 
+const AP_DOUBLE_CLICK = Symbol.for(`${MODULE_ID}.apDoubleClick`);
+
+export function installAPDoubleClick(tokenClass = CONFIG.Token.objectClass) {
+  const prototype = tokenClass.prototype;
+  const original = prototype._onClickLeft2;
+  if (original?.[AP_DOUBLE_CLICK]) return;
+  if (typeof original !== "function") throw new Error("Token double-click handler is unavailable.");
+  const handler = function(...args) {
+    if (game.user.isGM && isAP(this.document)) return new APEditor(this.document).render(true);
+    return original.apply(this, args);
+  };
+  handler[AP_DOUBLE_CLICK] = true;
+  prototype._onClickLeft2 = handler;
+}
+
 export function registerUI() {
+  Hooks.once("ready", () => installAPDoubleClick());
   Hooks.on("renderTokenHUD", (hud, html) => {
     const doc = hud.object?.document;
     if (!game.user.isGM || !isAP(doc)) return;
@@ -327,7 +358,6 @@ export function registerUI() {
     if (apData(doc).discovery?.revealed) {
       add("Hide access point from everyone", "fa-eye-slash", () => hideAPs([doc]));
       add("Pulse access point", "fa-tower-broadcast", () => {
-        if (setting("pulseAudience") === "runner") return openScanner({ scene: doc.parent, selected: [doc.id] });
         return pulseAPs([doc]);
       });
       add("Stop pulsing", "fa-stop", () => stopPulses([doc]));

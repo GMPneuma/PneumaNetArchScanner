@@ -1,5 +1,5 @@
 export const MODULE_ID = "pneuma-net-arch-scanner";
-export const MODULE_TITLE = "Pneuma NET Architecture Scanner";
+export const MODULE_TITLE = "Pneuma's NetArch Scanner";
 export const SYSTEM_ID = "cyberpunk-red-core";
 export const SCHEMA_VERSION = 1;
 export const TYPES = Object.freeze([
@@ -13,5 +13,5 @@ export const TYPES = Object.freeze([
 export const PALETTE = Object.freeze([
   "#55ddee", "#ffad55", "#c89aff", "#81e69a", "#ff7196", "#f1db62", "#6aaaff",
 ]);
-export const DEFAULT_COLOR = "#b9c5d2";
+export const DEFAULT_COLOR = "#ff0000";
 export const iconPath = (type) => `modules/${MODULE_ID}/assets/${TYPES.find((t) => t.id === type)?.icon ?? TYPES[0].icon}`;

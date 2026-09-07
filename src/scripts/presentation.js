@@ -89,7 +89,12 @@ export class APPresentation {
     sprite.height = height * Math.abs(doc.texture.scaleY ?? 1);
     sprite.rotation = (doc.rotation ?? 0) * Math.PI / 180;
     sprite.tint = color;
-    if (game.user.isGM && token.mesh) token.mesh.tint = color;
+    if (game.user.isGM && token.mesh) {
+      token.mesh.tint = color;
+      // Hidden tokens are normally faded for the GM. Keep AP strokes opaque;
+      // only the SVG background carries its own 25% opacity.
+      token.mesh.alpha = 1;
+    }
     label.text = doc.name;
     label.style.fontSize = Math.max(10, Math.min(20, canvas.grid.size * 0.13));
     label.position.set(0, height / 2 + 6);

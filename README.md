@@ -1,4 +1,4 @@
-# Pneuma NET Architecture Scanner
+# Pneuma's NetArch Scanner
 
 Access point tokens and GM discovery controls for **Foundry VTT 12 + Cyberpunk RED Core**.
 
@@ -8,9 +8,9 @@ Version **0.5.0**, first public release. Automated and isolated browser checks p
 
 Install using this manifest URL: https://github.com/GMPneuma/PneumaNetArchScanner/releases/latest/download/module.json
 
-For manual installation, copy `dist/pneuma-net-arch-scanner/` into your Foundry user data `Data/modules/` directory. Restart Foundry if needed, then enable **Pneuma NET Architecture Scanner** in a Cyberpunk RED world.
+For manual installation, copy `dist/pneuma-net-arch-scanner/` into your Foundry user data `Data/modules/` directory. Restart Foundry if needed, then enable **Pneuma's NetArch Scanner** in a Cyberpunk RED world.
 
-The first active GM automatically receives an Actor folder named **Pneuma NET Architecture Scanner**, containing six reusable templates: **Computer, Camera, Turret, Door Controller, and Alarm Panel**.
+The first active GM automatically receives an Actor folder named **Pneuma's NetArch Scanner**, containing six reusable templates: **Computer, Camera, Turret, Door Controller, and Alarm Panel**.
 
 Templates use the system's native container Actor type. Existing templates and GM edits are preserved; missing templates are recreated on a later GM startup.
 
@@ -101,5 +101,5 @@ Generic artwork: Font Awesome Free 6.7.2 by Fonticons, Inc., https://fontawesome
 
 For a scene with one network, leave APs **Unassigned** and set **Unassigned AP color** in the Scanner window. This color belongs only to that scene and applies to its unassigned markers, pulses, and list swatches. APs assigned to a NET Architecture retain that Architecture's color. No NET Architecture item is required for the unassigned color.
 
-Under **Configure Settings → Pneuma NET Architecture Scanner → Manage Types**, the GM can add and rename types, choose image files, and enable or disable types. New enabled types receive template Actors. Existing placed APs and edited Actor templates are preserved. Disabled types remain valid on existing APs but are excluded from new assignments.
+Under **Configure Settings → Pneuma's NetArch Scanner → Manage Types**, the GM can add and rename types, choose image files, and enable or disable types. New enabled types receive template Actors. Existing placed APs and edited Actor templates are preserved. Disabled types remain valid on existing APs but are excluded from new assignments.
 Enable **Show 'Reveal to all' option** in module settings to display that column and its bulk checkbox; disable it to hide them. Existing discoveries remain unchanged.

@@ -19,6 +19,10 @@ async function provision() {
   let folder = game.folders.find((entry) => entry.type === "Actor"
     && (entry.getFlag(MODULE_ID, "templates") || (!entry.folder && entry.name === MODULE_TITLE)));
   if (!folder) folder = await Folder.create({ name: MODULE_TITLE, type: "Actor", sorting: "a", flags: { [MODULE_ID]: { templates: true } } });
+  const updates = game.actors.filter((actor) => (actor.getFlag?.(MODULE_ID, "templateType") || isAP(actor.prototypeToken))
+    && actor.prototypeToken?.appendNumber !== true)
+    .map((actor) => ({ _id: actor.id, "prototypeToken.appendNumber": true }));
+  if (updates.length) await Actor.updateDocuments(updates);
   const missing = accessPointTypes().filter((type) => !game.actors.some((actor) => actor.getFlag(MODULE_ID, "templateType") === type.id));
   if (!missing.length) return;
   // createDocuments uses the native data model without CPRContainerActor.create's shop defaults.
@@ -27,7 +31,7 @@ async function provision() {
     img: typeImage(type.id), system: {}, items: [], ownership: { default: 0 },
     flags: { [MODULE_ID]: { templateType: type.id }, [SYSTEM_ID]: { "container-type": "custom" } },
     prototypeToken: {
-      name: type.label, actorLink: false, width: 0.5, height: 0.5,
+      name: type.label, actorLink: false, appendNumber: true, width: 0.5, height: 0.5,
       texture: { src: typeImage(type.id) }, hidden: true, disposition: 0,
       displayName: CONST.TOKEN_DISPLAY_MODES.OWNER_HOVER,
       displayBars: CONST.TOKEN_DISPLAY_MODES.NONE,

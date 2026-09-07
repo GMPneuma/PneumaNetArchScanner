@@ -2,7 +2,7 @@
 
 ## Completed checks
 
-- 69 automated tests pass, including checkbox audience replacement, mixed bulk states, unchanged-property preservation, per-AP name controls, configured pulse-count labels and expiration, atomic validation, and existing discovery, Scanner, template, and presentation coverage.
+- 73 automated tests pass, including checkbox audience replacement, mixed bulk states, unchanged-property preservation, per-AP name controls, configured pulse-count labels and expiration, atomic validation, and existing discovery, Scanner, template, and presentation coverage.
 - JavaScript syntax, relative imports, manifest identity/version/Foundry target, templates, and all six SVG asset references pass validation.
 - Source and built module payloads pass the same validation.
 - An isolated browser harness exercised the actual module forms and PIXI 7.4.3 artwork/pulse rendering. It checked radius filtering, selected-only updates, private recipients, Name/Type/Architecture edits, HTML escaping, stale-selection replacement, finite pulse completion, continuous looping, and exclusion of an unrelated player.
@@ -48,3 +48,5 @@ Record the exact Foundry and Cyberpunk RED versions and any active vision/HUD mo
 - Isolated browser checks cover scene-color saving and swatches, adding/saving a custom type, provisioning its template, and disabling it. Unit tests cover per-scene isolation, assigned Architecture precedence, permissions, and disabled-type preservation.
 
 - Grid measurement delegates to Foundry 12 Scene.grid.measurePath; tested consistent display/filter behavior and native token centers. API: https://foundryvtt.com/api/v12/classes/foundry.grid.BaseGrid.html#measurePath
+
+- Multiple-Netrunner regression: verified in unit tests and an isolated browser that selecting the second token targets its player for row and bulk reveals, and changing the selected runner updates private-reveal checkbox state.

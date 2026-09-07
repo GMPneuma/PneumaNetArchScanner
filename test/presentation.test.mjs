@@ -97,3 +97,15 @@ test("scene teardown removes ticker callbacks and all local sources", async () =
   assert.equal(tickers.size, 1); display.destroy();
   assert.equal(tickers.size, 0); assert.equal(display.entries.size, 0); assert.equal(display.lights.size, 0);
 });
+
+test("GM AP artwork uses full color opacity without unhiding the token", async () => {
+  const {values}=renderingEnvironment();
+  const ap=makeToken(canvas.scene); apData(ap).netarch="Item.red";
+  values.set("netarchColors",{entries:[{uuid:"Item.red",color:"#ff0000"}]});
+  const token=canvas.tokens.get(ap.id); token.mesh={alpha:0.5,tint:0xffffff};
+  const display=new APPresentation(); await display.refresh();
+  assert.equal(token.mesh.alpha,1); assert.equal(token.mesh.tint,0xff0000);
+  assert.equal(ap.hidden,true); assert.equal(apData(ap).discovery.revealed,false);
+  assert.equal(canvas.scene.updates.length,0);
+  display.destroy();
+});

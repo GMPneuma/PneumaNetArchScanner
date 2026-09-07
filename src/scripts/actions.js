@@ -67,7 +67,7 @@ async function updateGroups(documents, changes) {
   for (const [scene, updates] of groups) await scene.updateEmbeddedDocuments("Token", updates);
 }
 
-export async function revealAPs(documents, { runner = null, audience = setting("revealAudience"), pulseAudience = setting("pulseAudience"), pulse = setting("autoPulse") } = {}) {
+export async function revealAPs(documents, { runner = null, audience = "all", pulseAudience = "all", pulse = setting("autoPulse") } = {}) {
   const docs = checkedDocuments(documents);
   const recipients = audienceFor(audience, runner);
   const pulseRecipients = pulse ? audienceFor(pulseAudience, runner) : null;
@@ -84,7 +84,7 @@ export async function hideAPs(documents) {
   return docs.length;
 }
 
-export async function pulseAPs(documents, { runner = null, audience = setting("pulseAudience") } = {}) {
+export async function pulseAPs(documents, { runner = null, audience = "all" } = {}) {
   const docs = checkedDocuments(documents).filter((doc) => apData(doc).discovery?.revealed);
   if (!docs.length) throw new Error("Reveal an access point before pulsing it.");
   const recipients = audienceFor(audience, runner);
@@ -131,7 +131,7 @@ export async function applyAPControls(documents, changes, { runner = null } = {}
   if (startPulse && docs.some(doc => reveal === "hidden" || (!reveal && !apData(doc).discovery?.revealed))) {
     throw new Error("Reveal every selected AP before pulsing, or choose a reveal option together with the pulse.");
   }
-  const pulseRecipients = startPulse ? audienceFor(setting("pulseAudience"), runner) : null;
+  const pulseRecipients = startPulse ? audienceFor("all", runner) : null;
   await updateGroups(docs, () => {
     const updates = {};
     if (showName !== undefined) updates[`flags.${MODULE_ID}.showName`] = showName;

@@ -58,6 +58,9 @@ export function environment() {
   globalThis.fromUuid = async (uuid) => docs.get(uuid) ?? null;
   globalThis.canvas = { ready: true, scene: null, tokens: { controlled: [], placeables: [], get: (id) => canvas.tokens.placeables.find((token) => token.id === id) }, grid: { size: 100 } };
   globalThis.Actor = {
+    updateDocuments: async (updates) => updates.map((changes) => {
+      const actor = game.actors.get(changes._id); applyChanges(actor, changes); return actor;
+    }),
     createDocuments: async (data) => data.map((entry, index) => {
       const actor = { ...structuredClone(entry), id: `template-${game.actors.size}-${index}`, getFlag(scope, key) { return this.flags?.[scope]?.[key]; } };
       game.actors.set(actor.id, actor); return actor;

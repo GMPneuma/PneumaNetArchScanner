@@ -13,7 +13,7 @@ export function registerSettings(onChange) {
     scope: "world", config: true, onChange, ...data,
   });
   register("apTypes", { config: false, type: Object, default: {} });
-  const audiences = { all: "All players and GM", runner: "Only Netrunner and GM" };
+  Hooks.on("renderSettingsConfig", (_app, html) => groupRevealSettings(html));
   register("revealStyle", {
     name: "AP reveal style", hint: "Show AP artwork over fog, or also provide a small circle of vision around it.",
     type: String, default: "fog", choices: { fog: "Above fog of war", vision: "Small vision circle" },
@@ -29,8 +29,6 @@ export function registerSettings(onChange) {
   // Use the former preference as the default until the positive option is saved.
   register("hideRevealAll", { config: false, type: Boolean, default: false });
   register("showRevealAll", { name: "Show 'Reveal to all' option", hint: "Show the Reveal to all column and bulk checkbox in the Scanner window. Existing discoveries are unchanged.", type: Boolean, default: !setting("hideRevealAll") });
-  register("revealAudience", { name: "Default reveal audience", type: String, default: "all", choices: audiences });
-  register("pulseAudience", { name: "Default pulse audience", type: String, default: "all", choices: audiences });
   register("autoPulse", { name: "Pulse when revealing an AP", type: Boolean, default: true });
   register("pulseCount", { name: "Number of pulses", hint: "Used by finite pulses and the Scanner checkbox labels. Looping is selected in the AP list.", type: Number, default: 5, range: { min: 1, max: 20, step: 1 } });
   register("pulseDuration", { name: "Seconds per pulse", type: Number, default: 1.4, range: { min: 0.4, max: 5, step: 0.1 } });
@@ -38,4 +36,27 @@ export function registerSettings(onChange) {
   register("showLabels", { config: false, type: Boolean, default: true });
   register("autoScanner", { name: "Open GM controls after a Scanner roll", type: Boolean, default: true });
   register("netarchColors", { config: false, type: Object, default: { entries: [] } });
+}
+
+export function groupRevealSettings(html) {
+  const root = html[0] ?? html;
+  const style = root.querySelector(`[name="${MODULE_ID}.revealStyle"]`);
+  const radius = root.querySelector(`[name="${MODULE_ID}.visionRadius"]`);
+  if (!style || !radius || style.closest(".pneuma-ap-reveal-settings")) return;
+  const styleRow = style.closest(".form-group"), radiusRow = radius.closest(".form-group");
+  if (!styleRow || !radiusRow) return;
+  const group = document.createElement("fieldset");
+  group.className = "pneuma-ap-reveal-settings";
+  const legend = document.createElement("legend");
+  legend.textContent = "Access point visibility";
+  group.append(legend);
+  styleRow.before(group);
+  group.append(styleRow, radiusRow);
+  const sync = () => {
+    const disabled = style.value !== "vision";
+    radiusRow.querySelectorAll("input").forEach(input => { input.disabled = disabled; });
+    radiusRow.classList.toggle("ap-radius-disabled", disabled);
+  };
+  style.addEventListener("change", sync);
+  sync();
 }

@@ -9,14 +9,14 @@ export const CONTROL_OPTIONS = [
 ];
 export const visibleControls = () => CONTROL_OPTIONS.filter(option => option.key !== "all" || setting("showRevealAll") !== false);
 
-export function controlState(doc, now) {
+export function controlState(doc, now, runnerUuid = undefined) {
   const { discovery, pulse } = apData(doc);
   const active = discovery?.revealed && pulseProgress(pulse, now) !== null;
-  return { runner: Boolean(discovery?.revealed && !discovery.public), all: Boolean(discovery?.revealed && discovery.public),
+  return { runner: Boolean(discovery?.revealed && !discovery.public && (runnerUuid === undefined || (runnerUuid && discovery.runners?.includes(runnerUuid)))), all: Boolean(discovery?.revealed && discovery.public),
     five: Boolean(active && !pulse.loop), loop: Boolean(active && pulse.loop), showName: Boolean(apData(doc).showName ?? setting("showLabels")) };
 }
-export function bulkControls(documents, changes, now) {
-  const states = documents.map(doc => controlState(doc, now));
+export function bulkControls(documents, changes, now, runnerUuid = undefined) {
+  const states = documents.map(doc => controlState(doc, now, runnerUuid));
   return visibleControls().map(option => {
     const count = states.filter(state => state[option.key]).length;
     const dirty = changes[option.group] !== undefined;

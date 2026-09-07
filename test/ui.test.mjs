@@ -11,7 +11,7 @@ globalThis.Application = class {
   async close() { this.rendered = false; }
 };
 globalThis.FormApplication = class extends Application { constructor(object, options) { super(options); this.object = object; } };
-const { openScanner, ScannerPanel } = await import("../src/scripts/ui.js");
+const { openScanner, ScannerPanel, APEditor, installAPDoubleClick } = await import("../src/scripts/ui.js");
 
 test("right-click selection replaces stale selections from an earlier Scanner window", async () => {
   environment(); const scene = makeScene("manual"); const a = makeToken(scene, "a"), b = makeToken(scene, "b");
@@ -130,8 +130,8 @@ test("Netrunner dropdown filters roles and optionally player ownership, includin
   fake.actor.items.set("skill",{id:"skill",type:"skill",name:"Netrunner"});
   makeToken(scene,"ap");
   const panel=new ScannerPanel({scene,runnerId:npc.id});
-  assert.deepEqual(panel.getData().runners.map(r=>r.id),[player.id,npc.id,offline.id]);
-  panel.playerOwnedOnly=true;
+  assert.equal(panel.getData().playerOwnedOnly,true);
+
   assert.deepEqual(panel.getData().runners.map(r=>r.id),[player.id,offline.id]);
   assert.equal(panel.runnerId,""); assert.equal(panel.runner,null);
   panel.playerOwnedOnly=false;
@@ -175,4 +175,69 @@ test("displayed distances and selection filtering share the scene grid measureme
   scene.grid.measurePath=()=>({distance:14,euclidean:10});
   assert.equal(panel.getData().rows[0].visible,false);
   assert.equal(panel.selected.size,0);
+});
+
+test("private reveals follow the selected second Netrunner for row and bulk actions", async () => {
+  environment(); const scene=makeScene();
+  const first=makeToken(scene,"first",{ap:false,owners:["player"]});
+  const second=makeToken(scene,"second",{ap:false,owners:["other"]});
+  const a=makeToken(scene,"a"), b=makeToken(scene,"b");
+  const panel=new ScannerPanel({scene,runnerId:first.id,selected:[a.id,b.id]});
+  await panel.applyControls([a],{reveal:"runner"});
+  assert.deepEqual(apData(a).discovery.users,["player"]);
+  panel.readRunnerSelection({querySelector:()=>({value:second.id})});
+  let data=panel.getData();
+  assert.equal(data.rows.find(row=>row.id===a.id).controls.find(option=>option.key==="runner").checked,false);
+  await panel.applyControls([a],{reveal:"runner"});
+  assert.deepEqual(apData(a).discovery.users,["other"]);
+  assert.deepEqual(apData(a).discovery.runners,[second.uuid]);
+  panel.bulkChanges={reveal:"runner"};
+  await panel.handleAction("apply");
+  assert.deepEqual(apData(b).discovery.users,["other"]);
+  data=panel.getData();
+  assert.equal(data.bulkControls.find(option=>option.key==="runner").checked,true);
+  panel.runnerId=first.id;
+  assert.equal(panel.getData().bulkControls.find(option=>option.key==="runner").checked,false);
+});
+
+test("Revealed to shows the recorded Netrunner token rather than its player accounts or current selection", async () => {
+  environment(); const scene=makeScene();
+  const pex=makeToken(scene,"pex-token",{ap:false,name:"Pex",owners:["player","other"]});
+  const other=makeToken(scene,"other-token",{ap:false,name:"Other runner"});
+  const ap=makeToken(scene,"ap");
+  const panel=new ScannerPanel({scene,runnerId:pex.id});
+  await panel.applyControls([ap],{reveal:"runner"});
+  const discovery=structuredClone(apData(ap).discovery);
+  panel.runnerId=other.id;
+  let row=panel.getData().rows[0];
+  assert.equal(row.status,`Pex · ${pex.id.slice(-4)}`);
+  assert.match(row.statusTitle,/Netrunner player/);
+  assert.match(row.statusTitle,/Other player/);
+  assert.deepEqual(apData(ap).discovery,discovery);
+  scene.tokens.delete(pex.id);
+  assert.equal(panel.getData().rows[0].status,"Removed Netrunner token");
+});
+
+test("GM AP double-click opens properties and preserves ordinary container behavior", () => {
+  environment(); const scene = makeScene("double-click");
+  const ap = makeToken(scene, "ap");
+  const ordinary = makeToken(scene, "container", { ap: false }); ordinary.actor.type = "container";
+  const calls = [];
+  class Token {
+    constructor(document) { this.document = document; }
+    _onClickLeft2(...args) { calls.push({ token: this, args }); return "native"; }
+  }
+  installAPDoubleClick(Token);
+  const installed = Token.prototype._onClickLeft2;
+  installAPDoubleClick(Token);
+  assert.equal(Token.prototype._onClickLeft2, installed);
+  const editor = new Token(ap)._onClickLeft2({});
+  assert.ok(editor instanceof APEditor);
+  assert.equal(editor.object, ap); assert.equal(editor.rendered, true); assert.equal(calls.length, 0);
+  const normalToken = new Token(ordinary), event = {};
+  assert.equal(normalToken._onClickLeft2(event, "extra"), "native");
+  assert.equal(calls[0].token, normalToken); assert.deepEqual(calls[0].args, [event, "extra"]);
+  game.user = game.users.get("player");
+  assert.equal(new Token(ap)._onClickLeft2(event), "native");
+  assert.equal(calls.length, 2);
 });

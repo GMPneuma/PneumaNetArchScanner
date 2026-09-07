@@ -51,3 +51,10 @@ test("Unassigned color is scene-specific and assigned Architecture colors take p
   game.user=game.users.get("player");
   await assert.rejects(saveUnassignedColor(a,"#ffffff"),/Only a GM/);
 });
+
+test("unset Unassigned colors default to pure red without replacing saved scene colors", () => {
+  environment(); const scene=makeScene();
+  assert.equal(colorFor("",scene),"#ff0000");
+  scene.flags={[MODULE_ID]:{unassignedColor:"#b9c5d2"}};
+  assert.equal(colorFor("",scene),"#b9c5d2");
+});
