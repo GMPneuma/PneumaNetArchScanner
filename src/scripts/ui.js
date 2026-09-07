@@ -265,6 +265,10 @@ export class ScannerPanel extends Application {
     requireGM();
     if (this.busy) return;
     const doc = id ? this.scene.tokens.get(id) : null;
+    if (action === "hide-all") {
+      if (!this.documents.length) return;
+      return this.applyControls(this.documents, { reveal: "hidden", pulse: "off", showName: false });
+    }
     if (action === "edit" && doc) return new APEditor(doc).render(true);
     if (action === "locate" && doc) {
       if (canvas.scene?.id !== this.scene.id) throw new Error("View this scene to locate its access points.");

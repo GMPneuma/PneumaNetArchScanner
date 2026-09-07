@@ -258,3 +258,23 @@ test("reload installs AP double-click before the initial scene binds token callb
   const ordinary = makeToken(scene, "ordinary", { ap: false });
   assert.equal(new Token(ordinary).doubleClick(), "native");
 });
+test("emergency Hide All ignores selection and radius, resets all disclosures and pulses only on its scene", async () => {
+  environment(); const scene = makeScene("emergency");
+  const a = makeToken(scene, "near"), b = makeToken(scene, "far", { x: 10000 });
+  const other = makeToken(makeScene("other-scene"), "other");
+  for (const doc of [a,b,other]) {
+    apData(doc).discovery = { revealed: true, public: true, users: ["player"], runners: ["runner"] };
+    apData(doc).pulse = { loop: true };
+    apData(doc).showName = true;
+  }
+  const panel = new ScannerPanel({ scene }); panel.radius = 1;
+  await panel.handleAction("hide-all");
+  for (const doc of [a,b]) {
+    assert.equal(apData(doc).discovery.revealed, false);
+    assert.deepEqual(apData(doc).discovery.users, []);
+    assert.equal(apData(doc).pulse, null);
+    assert.equal(apData(doc).showName, false);
+  }
+  assert.equal(apData(other).discovery.revealed, true);
+  assert.equal(apData(other).pulse.loop, true);
+});

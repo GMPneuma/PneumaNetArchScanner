@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.6
+
+- Add a red Hide All AP's emergency button to Scanner controls.
+- Clear all discoveries, name reveals, and pulses on the panel's scene, regardless of selection or distance filter. Other scenes are unchanged.
+
 ## 0.8.5
 
 - Rename the Scanner roll-card action to Reveal Access Points to Netrunner.
