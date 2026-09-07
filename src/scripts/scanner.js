@@ -65,7 +65,7 @@ export function registerScannerHooks(openScanner) {
     if (root.querySelector(".pneuma-open-scanner")) return;
     const button = document.createElement("button");
     button.type = "button"; button.className = "pneuma-open-scanner";
-    button.textContent = "Manage Scanner discoveries";
+    button.textContent = "Reveal Access Points to Netrunner";
     button.addEventListener("click", () => {
       const context = resolveScan(message);
       if (context) openScanner(context);

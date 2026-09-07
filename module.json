@@ -2,7 +2,7 @@
   "id": "pneuma-net-arch-scanner",
   "title": "Pneuma's NetArch Scanner",
   "description": "Token-based access points, GM Scanner discovery controls, private reveals, vision circles, and NET Architecture-colored pulses for Cyberpunk RED.",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "authors": [
     {
       "name": "GMPneuma"
@@ -28,5 +28,5 @@
   ],
   "url": "https://github.com/GMPneuma/PneumaNetArchScanner",
   "manifest": "https://github.com/GMPneuma/PneumaNetArchScanner/releases/latest/download/module.json",
-  "download": "https://github.com/GMPneuma/PneumaNetArchScanner/releases/download/v0.8.4/pneuma-net-arch-scanner-v0.8.4.zip"
+  "download": "https://github.com/GMPneuma/PneumaNetArchScanner/releases/download/v0.8.5/pneuma-net-arch-scanner-v0.8.5.zip"
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.5
+
+- Rename the Scanner roll-card action to Reveal Access Points to Netrunner.
+- Give the action a solid green button style with white text, a border, and hover and keyboard-focus feedback.
+
 ## 0.8.4
 
 - Keep previous recipients when revealing an AP to another Netrunner. Unchecking removes only the selected Netrunner, preserving access through shared owners.
