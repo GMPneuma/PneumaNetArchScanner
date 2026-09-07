@@ -107,7 +107,7 @@ export class ScannerPanel extends Application {
       const recipients = (discovery?.runners ?? []).map(uuid => tokenNames.get(uuid) ?? "Removed Netrunner token");
       return {
         id: doc.id, name: doc.name, type: typeInfo(data.type)?.label ?? "Access Point",
-        netarch: data.netarch ? netNames.get(data.netarch) ?? "Missing Architecture" : "Unassigned",
+        netarch: data.netarch ? netNames.get(data.netarch) ?? "Missing Architecture" : "Undefined Scene NetArch",
         color: colorFor(data.netarch, this.scene), distance, distanceText: distance === null ? "—" : distance.toFixed(1),
         visible, selected: this.selected.has(doc.id),
         controls: visibleControls().map(option => ({ ...option, checked: controlState(doc, serverNow(), this.runner?.uuid ?? null)[option.key], apId: doc.id, name: doc.name })),

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.2
+
+- Rename Unassigned NetArch labels to Undefined Scene NetArch.
+- Apply saved pulse speed changes to active pulses while preserving their progress and count; expired pulses stay stopped.
+
 ## 0.8.1
 
 - Fix AP double-click properties after page reload by installing the handler before initial scene token callbacks are bound.

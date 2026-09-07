@@ -1,6 +1,7 @@
+import { activeGM } from "./templates.js";
 import { accessPointTypes, typeInfo, typeImage } from "./types.js";
 import { MODULE_ID, TYPES, iconPath } from "./constants.js";
-import { apData, architectureColor, blankDiscovery, isAP, mergeDiscovery } from "./model.js";
+import { apData, architectureColor, blankDiscovery, isAP, mergeDiscovery, pulseProgress } from "./model.js";
 import { setting, pulseCount } from "./settings.js";
 
 export function requireGM() {
@@ -142,4 +143,20 @@ export async function applyAPControls(documents, changes, { runner = null } = {}
     return updates;
   });
   return docs.length;
+}
+
+export async function updateActivePulseSpeed(seconds) {
+  if (!game.user.isGM || activeGM()?.id !== game.user.id) return;
+  const duration = Math.max(400, Math.min(5000, Number(seconds) * 1000 || 1400));
+  const now = serverNow();
+  const docs = game.scenes.contents.flatMap(scene => scene.tokens.contents)
+    .filter(doc => isAP(doc) && apData(doc).discovery?.revealed && pulseProgress(apData(doc).pulse, now) !== null);
+  await updateGroups(docs, doc => {
+    const pulse = apData(doc).pulse;
+    const completed = (now - pulse.started) / pulse.duration;
+    return {
+      [`flags.${MODULE_ID}.pulse.duration`]: duration,
+      [`flags.${MODULE_ID}.pulse.started`]: now - completed * duration,
+    };
+  });
 }

@@ -11,7 +11,7 @@
     <label>NET Architecture</label>
     <div class="form-fields">
       <select name="netarch">
-        <option value="" {{#if noNet}}selected{{/if}}>Unassigned</option>
+        <option value="" {{#if noNet}}selected{{/if}}>Undefined Scene NetArch</option>
         {{#each nets}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
       </select>
       <button type="button" class="ap-icon-button" data-action="open-netarch" title="Open NET Architecture" {{#unless hasNet}}disabled{{/unless}}><i class="fas fa-up-right-from-square"></i></button>

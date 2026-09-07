@@ -32,7 +32,7 @@ export function registerSettings(onChange) {
   register("showRevealAll", { name: "Show 'Reveal to all' option", hint: "Show the Reveal to all column and bulk checkbox in the Scanner window. Existing discoveries are unchanged.", type: Boolean, default: !setting("hideRevealAll") });
   register("autoPulse", { name: "Pulse when revealing an AP", type: Boolean, default: true });
   register("pulseCount", { name: "Number of pulses", hint: "Used by finite pulses and the Scanner checkbox labels. Looping is selected in the AP list.", type: Number, default: 5, range: { min: 1, max: 20, step: 1 } });
-  register("pulseDuration", { name: "Seconds per pulse", type: Number, default: 1.4, range: { min: 0.4, max: 5, step: 0.1 } });
+  register("pulseDuration", { name: "Seconds per pulse", hint: "Lower values pulse faster. Saving updates running pulses as well as new pulses.", onChange: async value => { try { const { updateActivePulseSpeed } = await import("./actions.js"); await updateActivePulseSpeed(value); } catch (error) { ui.notifications.error(error.message); } finally { onChange?.(); } }, type: Number, default: 1.4, range: { min: 0.4, max: 5, step: 0.1 } });
   // Retained only as the fallback for APs created before per-token name controls.
   register("showLabels", { config: false, type: Boolean, default: true });
   register("autoScanner", { name: "Open GM controls after a Scanner roll", type: Boolean, default: true });

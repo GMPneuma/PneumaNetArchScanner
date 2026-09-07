@@ -99,7 +99,7 @@ Generic artwork: Font Awesome Free 6.7.2 by Fonticons, Inc., https://fontawesome
 
 ## Scene color and AP types
 
-For a scene with one network, leave APs **Unassigned** and set **Unassigned AP color** in the Scanner window. This color belongs only to that scene and applies to its unassigned markers, pulses, and list swatches. APs assigned to a NET Architecture retain that Architecture's color. No NET Architecture item is required for the unassigned color.
+For a scene with one network, leave APs **Undefined Scene NetArch** and set **Undefined Scene NetArch Color** in the Scanner window. This color belongs only to that scene and applies to its unassigned markers, pulses, and list swatches. APs assigned to a NET Architecture retain that Architecture's color. No NET Architecture item is required for the unassigned color.
 
 Under **Configure Settings → Pneuma's NetArch Scanner → Manage Types**, the GM can add and rename types, choose image files, and enable or disable types. New enabled types receive template Actors. Existing placed APs and edited Actor templates are preserved. Disabled types remain valid on existing APs but are excluded from new assignments.
 Enable **Show 'Reveal to all' option** in module settings to display that column and its bulk checkbox; disable it to hide them. Existing discoveries remain unchanged.

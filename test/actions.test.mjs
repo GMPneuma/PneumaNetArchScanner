@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { MODULE_ID } from "../src/scripts/constants.js";
 import { apData } from "../src/scripts/model.js";
-import { applyAPControls, audienceFor, colorFor, hideAPs, pulseAPs, revealAPs, saveAP, stopPulses } from "../src/scripts/actions.js";
+import { updateActivePulseSpeed, applyAPControls, audienceFor, colorFor, hideAPs, pulseAPs, revealAPs, saveAP, stopPulses } from "../src/scripts/actions.js";
 import { environment, makeScene, makeToken } from "./helpers.mjs";
 
 test("private reveal resolves all player owners, including offline owners", async () => {
@@ -92,4 +92,24 @@ test("invalid names, types, and Architecture references do not update APs", asyn
   ]) await assert.rejects(saveAP(ap, data));
   assert.equal(ap.name, "ap");
   assert.equal(ap.flags[MODULE_ID].netarch, "");
+});
+
+test("speed changes retime active pulses without restarting their count or reviving expired pulses", async () => {
+  environment(); const scene = makeScene();
+  const finite = makeToken(scene, "finite"), loop = makeToken(scene, "loop"), expired = makeToken(scene, "expired");
+  await revealAPs([finite, loop, expired], { pulse: false });
+  for (const doc of [finite, loop, expired]) apData(doc).pulse = { started: 7000, duration: 1000, count: 5, loop: false, audience: { public: true }, id: doc.id };
+  apData(loop).pulse.loop = true;
+  apData(expired).pulse.started = 0;
+  await updateActivePulseSpeed(0.5);
+  assert.equal(apData(finite).pulse.duration, 500);
+  assert.equal(apData(finite).pulse.started, 8500);
+  assert.equal(apData(finite).pulse.count, 5);
+  assert.equal(apData(loop).pulse.loop, true);
+  assert.equal(apData(loop).pulse.duration, 500);
+  assert.equal(apData(expired).pulse.duration, 1000);
+  game.time.serverTime = 11000;
+  await updateActivePulseSpeed(2);
+  assert.equal(apData(finite).pulse.duration, 500);
+  assert.equal(apData(loop).pulse.duration, 2000);
 });

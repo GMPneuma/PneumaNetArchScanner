@@ -1,7 +1,7 @@
 <section class="ap-scanner-body">
   <div class="ap-top {{#if hasRollCard}}ap-top-with-roll{{/if}}">
     <div class="ap-top-left">
-  <header class="ap-header"><strong><i class="fas fa-map-location-dot" aria-hidden="true"></i> {{sceneName}}</strong><label class="ap-scene-color">Unassigned NetArch Color<input type="color" name="unassignedColor" value="{{unassignedColor}}" title="Color for unassigned APs on this scene"></label>{{#if hasResult}}<span class="ap-result">Scanner check: {{result}}</span>{{/if}}</header>
+  <header class="ap-header"><strong><i class="fas fa-map-location-dot" aria-hidden="true"></i> {{sceneName}}</strong><label class="ap-scene-color">Undefined Scene NetArch Color<input type="color" name="unassignedColor" value="{{unassignedColor}}" title="Color for APs using Undefined Scene NetArch"></label>{{#if hasResult}}<span class="ap-result">Scanner check: {{result}}</span>{{/if}}</header>
     <div class="ap-top-controls">
       <h3 class="ap-section-title"><i class="fas fa-tower-broadcast" aria-hidden="true"></i> Scanner controls</h3>
       <div class="ap-runner-row"><label class="ap-runner-field">Netrunner token<select name="runner"><option value="">Choose Netrunner…</option>{{#each runners}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
