@@ -69,7 +69,7 @@ test("private artwork never gets created for an unrelated player", async () => {
   const entry = display.entries.get(ap.id);
   assert.equal(entry.sprite.visible, true);
   assert.equal(entry.sprite.width, 50);
-  assert.equal(entry.sprite.texture.path, ap.texture.src);
+  assert.ok(entry.sprite.texture.path.endsWith("/generic.svg"));
 });
 test("hiding an AP removes both its art and vision source", async () => {
   const { player, values } = renderingEnvironment(); values.set("revealStyle", "vision");
@@ -108,4 +108,25 @@ test("GM AP artwork uses full color opacity without unhiding the token", async (
   assert.equal(ap.hidden,true); assert.equal(apData(ap).discovery.revealed,false);
   assert.equal(canvas.scene.updates.length,0);
   display.destroy();
+});
+
+test("hidden AP names use generic artwork and revealing names restores actual token art", async () => {
+  const { player } = renderingEnvironment();
+  const ap = makeToken(canvas.scene);
+  ap.texture.src = "custom/turret.webp";
+  apData(ap).discovery = { revealed: true, public: true };
+  game.user = player;
+  const display = new APPresentation();
+  await display.refresh();
+  const entry = display.entries.get(ap.id);
+  assert.ok(entry.sprite.texture.path.endsWith("/generic.svg"));
+  assert.equal(entry.label.visible, false);
+  apData(ap).showName = true;
+  await display.refresh();
+  assert.equal(entry.sprite.texture.path, "custom/turret.webp");
+  assert.equal(entry.label.visible, true);
+  apData(ap).showName = false;
+  await display.refresh();
+  assert.ok(entry.sprite.texture.path.endsWith("/generic.svg"));
+  assert.equal(ap.texture.src, "custom/turret.webp");
 });

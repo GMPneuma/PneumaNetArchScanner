@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./constants.js";
+import { MODULE_ID, iconPath } from "./constants.js";
 import { apData, canSeeAP, canSeePulse, isAP, pulseProgress, tokenCenter } from "./model.js";
 import { colorFor, serverNow } from "./actions.js";
 import { setting } from "./settings.js";
@@ -51,15 +51,17 @@ export class APPresentation {
         this.entries.set(doc.id, entry);
       }
       entry.token = token;
-      if (!game.user.isGM && entry.texturePath !== doc.texture.src) {
-        entry.texturePath = doc.texture.src;
-        const path = doc.texture.src;
+      const path = Boolean(apData(doc).showName ?? setting("showLabels")) ? doc.texture.src : iconPath("generic");
+      if (!game.user.isGM && entry.texturePath !== path) {
+        entry.texturePath = path;
+        entry.sprite.texture = PIXI.Texture.EMPTY;
         // Resolve textures without blocking concealment/removal of other APs.
         loadTexture(path).then((texture) => {
           if (this.entries.get(doc.id) !== entry || entry.sprite.destroyed || entry.texturePath !== path) return;
           entry.sprite.texture = texture;
           this.layout(entry);
         }).catch((error) => {
+          if (entry.texturePath !== path) return;
           entry.texturePath = null;
           console.warn(`${MODULE_ID} | Could not load AP artwork`, error);
         });

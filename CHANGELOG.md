@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.3
+
+- Show the generic AP icon to players while the AP name is hidden. Revealing the name also reveals the actual token artwork; hiding it restores the generic icon.
+- Preserve actual token artwork and the GM view, with regression coverage for switching visibility.
+
 ## 0.8.2
 
 - Rename Unassigned NetArch labels to Undefined Scene NetArch.
