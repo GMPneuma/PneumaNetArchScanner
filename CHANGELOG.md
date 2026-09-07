@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.1
+
+- Fix AP double-click properties after page reload by installing the handler before initial scene token callbacks are bound.
+- Preserve normal container double-click behavior; add a regression test for initial scene loading.
+
 ## 0.8.0
 
 - Rename the module to Pneuma's NetArch Scanner.

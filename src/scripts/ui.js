@@ -333,7 +333,9 @@ export function installAPDoubleClick(tokenClass = CONFIG.Token.objectClass) {
 }
 
 export function registerUI() {
-  Hooks.once("ready", () => installAPDoubleClick());
+  // Token interaction callbacks bind before ready on an initial scene load.
+  Hooks.once("setup", () => installAPDoubleClick());
+  Hooks.on("canvasInit", () => installAPDoubleClick());
   Hooks.on("renderTokenHUD", (hud, html) => {
     const doc = hud.object?.document;
     if (!game.user.isGM || !isAP(doc)) return;

@@ -11,7 +11,7 @@ globalThis.Application = class {
   async close() { this.rendered = false; }
 };
 globalThis.FormApplication = class extends Application { constructor(object, options) { super(options); this.object = object; } };
-const { openScanner, ScannerPanel, APEditor, installAPDoubleClick } = await import("../src/scripts/ui.js");
+const { openScanner, ScannerPanel, APEditor, installAPDoubleClick, registerUI } = await import("../src/scripts/ui.js");
 
 test("right-click selection replaces stale selections from an earlier Scanner window", async () => {
   environment(); const scene = makeScene("manual"); const a = makeToken(scene, "a"), b = makeToken(scene, "b");
@@ -240,4 +240,21 @@ test("GM AP double-click opens properties and preserves ordinary container behav
   game.user = game.users.get("player");
   assert.equal(new Token(ap)._onClickLeft2(event), "native");
   assert.equal(calls.length, 2);
+});
+test("reload installs AP double-click before the initial scene binds token callbacks", async () => {
+  environment(); const scene = makeScene("initial-load");
+  const ap = makeToken(scene, "ap");
+  class Token {
+    constructor(document) { this.document = document; this.doubleClick = this._onClickLeft2.bind(this); }
+    _onClickLeft2() { return "native"; }
+  }
+  globalThis.CONFIG = { Token: { objectClass: Token } };
+  registerUI();
+  await Hooks.call("setup");
+  await Hooks.call("canvasInit");
+  const token = new Token(ap);
+  await Hooks.call("ready");
+  assert.ok(token.doubleClick() instanceof APEditor);
+  const ordinary = makeToken(scene, "ordinary", { ap: false });
+  assert.equal(new Token(ordinary).doubleClick(), "native");
 });
