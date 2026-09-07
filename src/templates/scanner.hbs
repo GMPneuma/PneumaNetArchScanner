@@ -1,22 +1,17 @@
 <section class="ap-scanner-body">
-  <header class="ap-header"><strong><i class="fas fa-map-location-dot" aria-hidden="true"></i> {{sceneName}}</strong>{{#if hasResult}}<span class="ap-result">Scanner check: {{result}}</span>{{/if}}</header>
   <div class="ap-top {{#if hasRollCard}}ap-top-with-roll{{/if}}">
+    <div class="ap-top-left">
+  <header class="ap-header"><strong><i class="fas fa-map-location-dot" aria-hidden="true"></i> {{sceneName}}</strong><label class="ap-scene-color">Unassigned NetArch Color<input type="color" name="unassignedColor" value="{{unassignedColor}}" title="Color for unassigned APs on this scene"></label>{{#if hasResult}}<span class="ap-result">Scanner check: {{result}}</span>{{/if}}</header>
     <div class="ap-top-controls">
       <h3 class="ap-section-title"><i class="fas fa-tower-broadcast" aria-hidden="true"></i> Scanner controls</h3>
-      <label class="ap-runner-field">Netrunner token<select name="runner"><option value="">Choose Netrunner…</option>{{#each runners}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
-      <label class="ap-player-owned"><input type="checkbox" name="playerOwnedOnly" {{#if playerOwnedOnly}}checked{{/if}}> Show only player-owned tokens</label>
-      <label class="ap-scene-color">Unassigned AP color<input type="color" name="unassignedColor" value="{{unassignedColor}}" title="Color for unassigned APs on this scene"></label>
-      <div class="ap-selection-tools">
-        <label class="ap-radius-field">Filter by Radius ({{units}})<input type="number" name="radius" value="{{radius}}" min="0" step="any"></label>
-        <button type="button" data-action="select-visible">Select All Shown</button><button type="button" data-action="clear">Clear Selection</button>
-        <span class="ap-selection-count">{{selectedCount}} selected</span>
-      </div>
-      <p class="notes">Zero lists all APs. Radius uses the scene’s grid measurement rules from the Netrunner; the GM decides what Scanner discovers.</p>
-      {{#if runnerMissing}}<p class="ap-hint">Choose a Netrunner for distances and private reveals.</p>{{/if}}
+      <div class="ap-runner-row"><label class="ap-runner-field">Netrunner token<select name="runner"><option value="">Choose Netrunner…</option>{{#each runners}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+      <label class="ap-player-owned"><input type="checkbox" name="playerOwnedOnly" {{#if playerOwnedOnly}}checked{{/if}}> only player tokens</label></div>
+      <label class="ap-radius-field"><span>Filter by distance({{units}}) from selected NetRunner. <small>zero = show all</small></span><input type="number" name="radius" value="{{radius}}" min="0" step="any"></label>
+    </div>
     </div>
     {{#if hasRollCard}}<section class="ap-roll-preview" aria-label="Scanner roll"><div class="ap-roll-card chat-log" aria-live="polite">Loading Scanner roll…</div></section>{{/if}}
   </div>
-  <h3 class="ap-section-title ap-discovery-title"><i class="fas fa-network-wired" aria-hidden="true"></i> Access points</h3>
+  <div class="ap-discovery-title"><h3 class="ap-section-title"><i class="fas fa-network-wired" aria-hidden="true"></i> Access points</h3><span class="ap-selection-count">{{selectedCount}} selected</span></div>
   <div class="ap-list-header" aria-label="Access point column headers"><table class="ap-control-table {{#unless showRevealAll}}ap-hide-reveal-all{{/unless}}"><colgroup><col class="ap-col-select"><col class="ap-col-name"><col class="ap-col-net"><col class="ap-col-distance"><col>{{#each bulkControls}}<col class="ap-col-toggle">{{/each}}</colgroup><thead><tr><th aria-label="Select"></th><th>Access Point</th><th>NetArch</th><th>Distance<br>({{units}})</th><th>Revealed to</th><th class="ap-toggle">Reveal to<br>Netrunner</th>{{#if showRevealAll}}<th class="ap-toggle">Reveal<br>to all</th>{{/if}}<th class="ap-toggle">{{pulseLabel}}</th><th class="ap-toggle">Pulse<br>forever</th><th class="ap-toggle">Show<br>AP name</th></tr></thead></table></div>
   <div class="ap-list">
     <table class="ap-control-table {{#unless showRevealAll}}ap-hide-reveal-all{{/unless}}"><colgroup><col class="ap-col-select"><col class="ap-col-name"><col class="ap-col-net"><col class="ap-col-distance"><col>{{#each bulkControls}}<col class="ap-col-toggle">{{/each}}</colgroup>
@@ -33,7 +28,7 @@
   </div>
   <footer class="ap-bulk-bar" aria-label="Bulk access point controls">
     <table class="ap-control-table {{#unless showRevealAll}}ap-hide-reveal-all{{/unless}}"><colgroup><col class="ap-col-select"><col class="ap-col-name"><col class="ap-col-net"><col class="ap-col-distance"><col>{{#each bulkControls}}<col class="ap-col-toggle">{{/each}}</colgroup>
-      <tbody><tr><td colspan="4"><strong>Apply to selected</strong></td><td class="ap-bulk-apply"><button type="button" data-action="apply" {{#unless canApply}}disabled{{/unless}}>Apply</button></td>
+      <tbody><tr><td colspan="2" class="ap-footer-selection"><div class="ap-selection-tools"><button type="button" data-action="select-visible">Select All Shown</button><button type="button" data-action="clear">Clear Selection</button></div></td><td colspan="2" class="ap-bulk-label"><strong>Apply to selected</strong></td><td class="ap-bulk-apply"><button type="button" data-action="apply" {{#unless canApply}}disabled{{/unless}}>Apply</button></td>
         {{#each bulkControls}}<td class="ap-toggle"><input type="checkbox" data-control="{{key}}" data-group="{{group}}" title="{{label}} for selected access points" aria-label="{{label}} for selected access points" {{#if checked}}checked{{/if}}></td>{{/each}}
       </tr></tbody>
     </table>
