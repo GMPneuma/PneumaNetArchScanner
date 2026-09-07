@@ -1,0 +1,11 @@
+<form class="ap-types-form">
+  <p class="notes">Add or rename types and choose their artwork. Disable a type to hide it from new selections. Existing APs and edited Actor templates are preserved.</p>
+  <div class="ap-types-list">
+    {{#each types}}<div class="ap-type-row" data-type-row="{{id}}">
+      <label class="ap-type-enabled"><input type="checkbox" data-field="enabled" aria-label="Enable {{label}}" {{#if enabled}}checked{{/if}}> Enabled</label>
+      <label>Name<input type="text" data-field="label" value="{{label}}" maxlength="80" required></label>
+      <label>Artwork<div class="ap-type-image"><input type="text" data-field="img" value="{{img}}" required><button type="button" data-action="browse-type" title="Choose artwork" aria-label="Choose artwork"><i class="fas fa-file-import"></i></button></div></label>
+    </div>{{/each}}
+  </div>
+  <footer class="ap-type-footer"><button type="button" data-action="add-type"><i class="fas fa-plus"></i> Add Type</button><button type="submit"><i class="fas fa-save"></i> Save Types</button></footer>
+</form>

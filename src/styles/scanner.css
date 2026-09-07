@@ -1,0 +1,87 @@
+.pneuma-scanner .window-content { padding: 12px; }
+.pneuma-scanner .ap-header { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+.pneuma-scanner .ap-result { font-weight: 700; }
+.pneuma-scanner .ap-filters, .pneuma-scanner .ap-audiences { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pneuma-scanner .ap-filters label, .pneuma-scanner .ap-audiences label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.pneuma-scanner select { width: 100%; min-width: 0; }
+.pneuma-scanner .notes { font-size: 12px; opacity: 0.85; line-height: 1.4; margin: 8px 0; }
+.pneuma-scanner .ap-hint { border-left: 3px solid #b77926; padding: 6px 10px; font-size: 12px; }
+.pneuma-scanner .ap-selection-tools { display: flex; gap: 8px; align-items: center; margin: 10px 0 6px; }
+.pneuma-scanner .ap-selection-tools button { width: auto; padding: 0 10px; }
+.pneuma-scanner .ap-selection-count { margin-left: auto; white-space: nowrap; font-size: 12px; }
+.pneuma-scanner .ap-list { max-height: 320px; overflow-y: auto; border: 1px solid var(--color-border-light-tertiary, #8886); }
+.pneuma-scanner .ap-control-table { margin: 0; width: 100%; }
+.pneuma-scanner .ap-control-table th, .pneuma-scanner .ap-control-table td { padding: 7px 6px; text-align: left; overflow-wrap: anywhere; }
+.pneuma-scanner .ap-control-table th { font-size: 12px; }
+.pneuma-scanner .ap-control-table td { font-size: 12px; }
+.pneuma-scanner tr[hidden] { display: none; }
+.pneuma-scanner .ap-control-table td small { display: block; opacity: 0.8; }
+.pneuma-scanner .ap-distance { white-space: nowrap; }
+.pneuma-scanner .ap-name-button { border: none; background: none; text-align: left; padding: 0; line-height: 1.4; font-weight: 600; }
+.pneuma-scanner .ap-icon-button { width: 28px; min-width: 28px; padding: 0; border: none; background: none; }
+.pneuma-scanner .ap-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; border: 1px solid #0005; }
+.pneuma-scanner .ap-empty { padding: 16px; text-align: center; }
+.pneuma-scanner .ap-auto-pulse { display: flex; align-items: center; gap: 4px; margin: 10px 0; }
+.pneuma-scanner .ap-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.pneuma-scanner .ap-actions button { flex: 1 1 30%; white-space: nowrap; }
+.pneuma-scanner .ap-primary { font-weight: 700; }
+.pneuma-scanner .ap-editor-form .form-group { margin-bottom: 12px; }
+.pneuma-scanner .ap-editor-form .form-fields { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.pneuma-ap-hud [hidden] { display: none !important; }
+.pneuma-ap-hud button.pneuma-ap-action { width: 40px; height: 40px; flex: 0 0 40px; margin: 0; padding: 0; color: inherit; }
+.pneuma-scanner .ap-control-table { min-width: 1010px; table-layout: fixed; }
+.pneuma-scanner .ap-control-table .ap-toggle { width: 78px; text-align: center; vertical-align: middle; }
+.pneuma-scanner .ap-name-edit { display: flex; align-items: center; gap: 4px; }
+.pneuma-scanner .ap-name-button { flex: 1; min-width: 0; }
+.pneuma-scanner .ap-bulk-label { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pneuma-scanner .ap-bulk-label button { width: 80px; }
+.pneuma-scanner tfoot { border-top: 2px solid var(--color-border-light-tertiary, #888); }
+.pneuma-scanner .ap-list { max-height: 420px; overflow: auto; }
+/* Keep bulk controls outside the list's scrolling viewport. */
+.pneuma-scanner-panel .window-content { overflow: hidden; }
+.pneuma-scanner-panel .ap-scanner-body { display: flex; flex-direction: column; min-height: 0; }
+.pneuma-scanner-panel .ap-scanner-body > :not(.ap-list) { flex-shrink: 0; }
+.pneuma-scanner-panel .ap-list { flex: 1 1 auto; min-height: 0; }
+.pneuma-scanner .ap-bulk-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 10px 6px; border: 1px solid var(--color-border-light-tertiary, #8886); border-top: 0; }
+.pneuma-scanner .ap-bulk-bar .ap-bulk-label { margin-right: auto; gap: 12px; }
+.pneuma-scanner .ap-bulk-bar > label { display: flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap; }
+/* Inline AP controls inherit the row surface, including under Foundry themes. */
+.pneuma-scanner-panel .ap-name-edit > button {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: inherit;
+  text-shadow: none;
+}
+.pneuma-scanner-panel .ap-name-edit > button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 1px;
+}
+
+.pneuma-scanner-panel .ap-roll-preview { height: 220px; overflow: auto; margin-bottom: 10px; }
+.pneuma-scanner-panel .ap-roll-card { width: 360px; max-width: 100%; margin: 0 auto; }
+.pneuma-scanner-panel .ap-roll-card > .chat-message { list-style: none; margin: 0; }
+
+.pneuma-scanner .ap-player-owned { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; }
+
+.pneuma-scanner .ap-types-list { max-height: 420px; overflow: auto; }
+.pneuma-scanner .ap-type-row { display: grid; grid-template-columns: 90px 1fr 1.5fr; gap: 10px; align-items: end; padding: 8px 0; }
+.pneuma-scanner .ap-type-row label { display: flex; flex-direction: column; gap: 4px; }
+.pneuma-scanner .ap-type-row .ap-type-enabled { flex-direction: row; align-items: center; }
+.pneuma-scanner .ap-type-image, .pneuma-scanner .ap-type-footer { display: flex; gap: 6px; }
+.pneuma-scanner .ap-type-image input { min-width: 0; flex: 1; }
+.pneuma-scanner .ap-type-image button { width: 30px; flex: 0 0 30px; }
+.pneuma-scanner .ap-type-footer { margin-top: 12px; }
+
+.pneuma-scanner .ap-scene-color { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; }
+.pneuma-scanner .ap-scene-color input { width: 48px; height: 26px; }
+
+.pneuma-scanner .ap-control-table.ap-hide-reveal-all { min-width: 932px; }
+
+.pneuma-scanner .ap-control-table .ap-col-select { width: 32px; }
+.pneuma-scanner .ap-control-table .ap-col-name { width: 22%; }
+.pneuma-scanner .ap-control-table .ap-col-net { width: 17%; }
+.pneuma-scanner .ap-control-table .ap-col-distance { width: 65px; }
+.pneuma-scanner .ap-control-table .ap-col-toggle { width: 78px; }
+.pneuma-scanner .ap-list-header { overflow: hidden; border: 1px solid var(--color-border-light-tertiary, #8886); border-bottom: 0; }
+.pneuma-scanner .ap-list-header, .pneuma-scanner .ap-list { scrollbar-gutter: stable; }

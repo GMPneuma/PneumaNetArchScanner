@@ -1,0 +1,15 @@
+{
+  "name": "pneuma-net-arch-scanner",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "Token-based NET Architecture access point discovery for Cyberpunk RED in Foundry VTT.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}
