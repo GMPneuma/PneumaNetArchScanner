@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.7
+
+- Declare verified Foundry VTT 12 compatibility to resolve the Compatibility Unknown status.
+- Move the emergency Hide All AP's button into the scene title card.
+
 ## 0.8.6
 
 - Add a red Hide All AP's emergency button to Scanner controls.
