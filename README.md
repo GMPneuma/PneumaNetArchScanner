@@ -1,12 +1,22 @@
 # Pneuma's NetArch Scanner
 
+## Testing build: 0.8.8-beta.1
+
+This branch requires **libWrapper** and uses its registrations for AP double-clicks and native Scanner roll cards. It is intended for compatibility testing with Item Piles; the reported conflict has not yet been reproduced in a live world.
+
+Install through the testing manifest listed below and enable libWrapper. The beta uses the same module ID as stable: it replaces the installed code and keeps existing settings and APs. It does not run alongside stable.
+
+To return to stable, reinstall using https://github.com/GMPneuma/PneumaNetArchScanner/releases/latest/download/module.json (Foundry may require uninstalling the beta module first to downgrade; keep the world and its data). Testing updates follow the testing manifest; stable users remain on the stable manifest.
+
+Suggested checks: reload with Item Piles enabled; double-click an AP to open AP properties; double-click an Item Pile to open its normal interface; double-click an ordinary token; roll Scanner and use its reveal button. Report any conflict warning with Foundry, Cyberpunk RED, Item Piles, and libWrapper versions.
+
 Access point tokens and GM discovery controls for **Foundry VTT 12 + Cyberpunk RED Core**.
 
 Version **0.5.0**, first public release. Automated and isolated browser checks pass; a live Foundry v12 world test is still required. The manifest targets Foundry 12; live Foundry verification remains pending.
 
 ## Installation
 
-Install using this manifest URL: https://github.com/GMPneuma/PneumaNetArchScanner/releases/latest/download/module.json
+Install using this manifest URL: https://raw.githubusercontent.com/GMPneuma/PneumaNetArchScanner/testing/module.json
 
 For manual installation, copy `dist/pneuma-net-arch-scanner/` into your Foundry user data `Data/modules/` directory. Restart Foundry if needed, then enable **Pneuma's NetArch Scanner** in a Cyberpunk RED world.
 

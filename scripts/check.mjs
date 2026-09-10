@@ -18,6 +18,7 @@ export async function check(contentRoot = resolve(root, "src")) {
   assert.ok(manifest.title && manifest.description);
   assert.ok(manifest.relationships.systems.some(({ id }) => id === "cyberpunk-red-core"));
   assert.ok(manifest.esmodules.length > 0);
+  assert.ok(manifest.relationships.requires.some(({ id }) => id === "lib-wrapper"));
 
   const assets = [
     ...manifest.esmodules,

@@ -27,6 +27,18 @@ export function applyChanges(object, changes) {
 }
 
 export function environment() {
+  // Contract mock: retain this/arguments and call through previously registered handlers.
+  globalThis.libWrapper = {
+    registrations: [],
+    register(module, target, wrapper, type) {
+      const parts = target.split(".");
+      const key = parts.pop();
+      const object = parts.reduce((value, part) => value[part], globalThis);
+      const previous = object[key];
+      this.registrations.push({ module, target, type });
+      object[key] = function(...args) { return wrapper.call(this, previous.bind(this), ...args); };
+    },
+  };
   const callbacks = new Map();
   globalThis.Hooks = {
     on: (name, fn) => { if (!callbacks.has(name)) callbacks.set(name, []); callbacks.get(name).push(fn); },

@@ -70,3 +70,13 @@ test("Scanner context includes its original chat message", () => {
   const message={id:"native-scanner",getFlag:()=>({actorId:runner.actorId,tokenId:runner.id,sceneId:scene.id,total:14})};
   assert.equal(resolveScan(message).messageId,"native-scanner");
 });
+
+test("roll-card integration registers an always-chained libWrapper wrapper", async () => {
+  environment(); makeScene(); let called = 0;
+  const chat = { RenderRollCard() { called++; return "normal-card"; } };
+  wrapRollCards(chat); wrapRollCards(chat);
+  assert.equal(libWrapper.registrations.length, 1);
+  assert.equal(libWrapper.registrations[0].type, "WRAPPER");
+  assert.equal(chat.RenderRollCard({}), "normal-card");
+  assert.equal(called, 1);
+});

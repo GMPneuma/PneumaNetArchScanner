@@ -321,19 +321,17 @@ export function openScanner({ scene = canvas.scene, runnerId = "", result = null
   return panel;
 }
 
-const AP_DOUBLE_CLICK = Symbol.for(`${MODULE_ID}.apDoubleClick`);
+const wrappedTokenClasses = new WeakSet();
 
 export function installAPDoubleClick(tokenClass = CONFIG.Token.objectClass) {
-  const prototype = tokenClass.prototype;
-  const original = prototype._onClickLeft2;
-  if (original?.[AP_DOUBLE_CLICK]) return;
-  if (typeof original !== "function") throw new Error("Token double-click handler is unavailable.");
-  const handler = function(...args) {
+  if (wrappedTokenClasses.has(tokenClass)) return;
+  if (typeof globalThis.libWrapper?.register !== "function") throw new Error("Enable libWrapper to use NetArch Scanner.");
+  if (typeof tokenClass.prototype._onClickLeft2 !== "function") throw new Error("Token double-click handler is unavailable.");
+  libWrapper.register(MODULE_ID, "CONFIG.Token.objectClass.prototype._onClickLeft2", function(wrapped, ...args) {
     if (game.user.isGM && isAP(this.document)) return new APEditor(this.document).render(true);
-    return original.apply(this, args);
-  };
-  handler[AP_DOUBLE_CLICK] = true;
-  prototype._onClickLeft2 = handler;
+    return wrapped(...args);
+  }, "MIXED");
+  wrappedTokenClasses.add(tokenClass);
 }
 
 export function registerUI() {

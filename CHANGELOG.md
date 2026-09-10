@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.8-beta.1 — Testing only
+
+- Require libWrapper and replace direct token double-click and Scanner roll-card overrides with MIXED and WRAPPER registrations.
+- Keep initial-load AP behavior and chain other handlers for ordinary tokens and native roll cards.
+- Use a separate testing manifest with the existing module ID; stable remains 0.8.7.
+- Item Piles compatibility needs live-world confirmation.
+
 ## 0.8.7
 
 - Declare verified Foundry VTT 12 compatibility to resolve the Compatibility Unknown status.

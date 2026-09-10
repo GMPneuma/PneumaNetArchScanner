@@ -3,16 +3,20 @@ import { scanContext } from "./model.js";
 import { activeGM } from "./templates.js";
 import { setting } from "./settings.js";
 
-const WRAPPED = Symbol.for(`${MODULE_ID}.scanner`);
+const wrappedChatClasses = new WeakSet();
 
 /** Decorate completed native roll cards; do not replace any system roll mechanics. */
 export function wrapRollCards(chatClass) {
   const original = chatClass.RenderRollCard;
-  if (original?.[WRAPPED]) return;
+  if (wrappedChatClasses.has(chatClass)) return;
   if (typeof original !== "function") throw new Error("The Cyberpunk RED roll-card entry point is unavailable.");
-  const wrapper = function(roll, ...args) {
+  if (typeof globalThis.libWrapper?.register !== "function") throw new Error("Enable libWrapper to use NetArch Scanner.");
+  // Expose the imported class itself so libWrapper wraps the actual system method.
+  globalThis.pneumaNetArchScannerCompat ??= {};
+  globalThis.pneumaNetArchScannerCompat.chatClass = chatClass;
+  const wrapper = function(wrapped, roll, ...args) {
     const context = scanContext(roll, canvas.scene?.id);
-    const result = original.call(this, roll, ...args);
+    const result = wrapped(roll, ...args);
     if (!context) return result;
     return Promise.resolve(result).then(async (message) => {
       if (!message) return message;
@@ -24,8 +28,8 @@ export function wrapRollCards(chatClass) {
       return message;
     });
   };
-  wrapper[WRAPPED] = true;
-  chatClass.RenderRollCard = wrapper;
+  libWrapper.register(MODULE_ID, "pneumaNetArchScannerCompat.chatClass.RenderRollCard", wrapper, "WRAPPER");
+  wrappedChatClasses.add(chatClass);
 }
 
 export async function installScannerIntegration() {

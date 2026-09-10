@@ -227,8 +227,10 @@ test("GM AP double-click opens properties and preserves ordinary container behav
     constructor(document) { this.document = document; }
     _onClickLeft2(...args) { calls.push({ token: this, args }); return "native"; }
   }
+  globalThis.CONFIG = { Token: { objectClass: Token } };
   installAPDoubleClick(Token);
   const installed = Token.prototype._onClickLeft2;
+  globalThis.CONFIG = { Token: { objectClass: Token } };
   installAPDoubleClick(Token);
   assert.equal(Token.prototype._onClickLeft2, installed);
   const editor = new Token(ap)._onClickLeft2({});
@@ -277,4 +279,36 @@ test("emergency Hide All ignores selection and radius, resets all disclosures an
   }
   assert.equal(apData(other).discovery.revealed, true);
   assert.equal(apData(other).pulse.loop, true);
+});
+
+test("libWrapper cooperates with another conditional token handler in either registration order", () => {
+  for (const scannerFirst of [true, false]) {
+    environment(); const scene = makeScene("chain");
+    const ap = makeToken(scene, "ap");
+    const ordinary = makeToken(scene, "ordinary", { ap: false });
+    class Token {
+      constructor(document, pile = false) { this.document = document; this.pile = pile; }
+      _onClickLeft2(value) { return `native:${value}`; }
+    }
+    globalThis.CONFIG = { Token: { objectClass: Token } };
+    const installOther = () => libWrapper.register("test-other", "CONFIG.Token.objectClass.prototype._onClickLeft2", function(wrapped, value) {
+      return this.pile ? `pile:${value}` : wrapped(value);
+    }, "MIXED");
+    if (scannerFirst) { installAPDoubleClick(); installOther(); }
+    else { installOther(); installAPDoubleClick(); }
+    assert.ok(new Token(ap)._onClickLeft2("event") instanceof APEditor);
+    assert.equal(new Token(ordinary, true)._onClickLeft2("event"), "pile:event");
+    assert.equal(new Token(ordinary)._onClickLeft2("event"), "native:event");
+    assert.equal(libWrapper.registrations.find(entry => entry.module === "pneuma-net-arch-scanner").type, "MIXED");
+    assert.equal(libWrapper.registrations.length, 2);
+  }
+});
+
+test("missing libWrapper never installs a direct token override", () => {
+  environment(); class Token { _onClickLeft2() { return "native"; } }
+  globalThis.CONFIG = { Token: { objectClass: Token } };
+  const original = Token.prototype._onClickLeft2;
+  delete globalThis.libWrapper;
+  assert.throws(() => installAPDoubleClick(), /Enable libWrapper/);
+  assert.equal(Token.prototype._onClickLeft2, original);
 });
